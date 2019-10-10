@@ -76,6 +76,8 @@ class Server {
           const server = serverlessExpress.createServer(apiApp);
           exports.main = (event, context) => serverlessExpress.proxy(server, event, context)
 
+          return resolve()
+
       } else {
 
         debug('starting server')
