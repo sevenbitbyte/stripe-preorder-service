@@ -2,7 +2,7 @@
 
 const DEFAULT_CONFIG = {
   rest: {
-    restUri: 'http://0.0.0.0:4001',
+    restUri: 'http://0.0.0.0:4000',
     cors: {
       originUri: 'http://localhost:3000'
     }
