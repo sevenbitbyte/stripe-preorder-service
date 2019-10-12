@@ -72,9 +72,10 @@ class Server {
       const isInLambda = !!process.env.LAMBDA_TASK_ROOT;
       if (isInLambda) {
           debug('starting lambda')
-          const serverlessExpress = require('aws-serverless-express');
-          const server = serverlessExpress.createServer(apiApp);
-          exports.main = (event, context) => serverlessExpress.proxy(server, event, context)
+          const serverless = require('serverless-http');
+          //const server = serverlessExpress.createServer(apiApp);
+          //exports.main = (event, context) => serverlessExpress.proxy(server, event, context)
+          exports.handler = serverless(this.apiApp);
 
           return resolve()
 
