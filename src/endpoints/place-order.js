@@ -1,7 +1,5 @@
-const debug = require('debug')('preorder.endpoint.place-order')
 const Joi = require('joi')
-
-
+const DefaultConfig = require('../default-config')
 
 const validator = Joi.object().keys({
   source: Joi.string().required(),
@@ -23,65 +21,53 @@ const validator = Joi.object().keys({
       postal_code: Joi.string()
     }
   }
-})
+});
 
-const Handler = async function(req, res){
-  debug('express', req.body)
+module.exports.place_order = (event, context, callback) => {
+  context.callbackWaitsForEmptyEventLoop = false; 
 
-  const valid = await Joi.validate(req.body, validator)
-
-  debug(valid)
-
-  res.send({
-    customer: {
-      id: 'st_cus_xy2cfjgj54'
-    },
-    order: {
-      order_id: 'abc_123_xyz_0987',
-      timestamp: Date.now(),
-      products: valid.products,
-      shipping: valid.shipping
-    }
-  })
-}
-
-exports.express = async function(req, res){
-  try{
-    return await Handler(req, res)
-  }
-  catch(e){
+  try {
+    const valid = Joi.validate(event.body, validator);
+    //console.log(valid);
+    callback(null,{
+      statusCode: 500,
+      body: JSON.stringify({
+        customer: {
+          id: 'st_cus_xy2cfjgj54'
+        },
+        order: {
+          order_id: 'abc_123_xyz_0987',
+          timestamp: Date.now(),
+          products: valid.products,
+          shipping: valid.shipping
+        }
+      })
+    });
+  } catch(e) {
     if(e.name == 'ValidationError'){
 
-      debug('msg -', e.message)
-      res.status(500).send({
-        error: {
-          name: e.name,
-          message: e.message
-        }
-      })
-
-      return
-      
+      console.log('msg -', e.message);
+      callback(null,{
+        statusCode: 500,
+        body: JSON.stringify({
+          error: {
+            name: e.name,
+            message: e.message
+          }
+        })
+      });
     }
     else {
-      debug(e.name)
-      debug('ERROR - ', e)
-      res.status(500).send({
-        error: {
+      console.log(e.name)
+      console.log('ERROR - ', e)
+      callback(null,{
+        statusCode: 500,
+        body: JSON.stringify({
+          error: {
           name: 'BadRequest',
           message: 'BadRequest'
-        }
-      })
+        }})
+      });
     }
   }
-}
-
-
-
-exports.handler = async function(event) {
-  const promise = new Promise(function(resolve, reject) {
-    resolve()
-  })
-    
-  return promise
 }

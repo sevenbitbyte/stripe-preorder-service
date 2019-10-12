@@ -9,13 +9,13 @@ plugins:
   - serverless-offline
 functions:
   app:
-    handler: src/server.handler
+    handler: src/endpoints/place-order.place_order
     events: 
       - http: 
-          path: /api-v1-place-order
+          path: api/v1/place-order
           method: GET
           cors: true
       - http: 
-          path: /api-v1-place-order
+          path: api/v1/place-order
           method: PUT
           cors: true
