@@ -75,7 +75,7 @@ class Server {
           const serverless = require('serverless-http');
           //const server = serverlessExpress.createServer(apiApp);
           //exports.main = (event, context) => serverlessExpress.proxy(server, event, context)
-          exports.handler = serverless(this.apiApp);
+          exports.handler = serverless(apiApp);
 
           return resolve()
 

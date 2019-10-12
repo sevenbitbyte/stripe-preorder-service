@@ -7,7 +7,7 @@ provider:
   memorySize: 128
 functions:
   app:
-    handler: apiApp/apiApp.handler
+    handler: src/endpoints/place-order.handler
     events: 
       - http: 
           path: /api-v1-place-order
