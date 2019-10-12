@@ -27,10 +27,12 @@ module.exports.place_order = (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false; 
 
   try {
-    const valid = Joi.validate(event.body, validator);
-    //console.log(valid);
+    const valid = Joi.attempt(event.body, validator);
+
+    console.log(valid);
+
     callback(null,{
-      statusCode: 500,
+      statusCode: 200,
       body: JSON.stringify({
         customer: {
           id: 'st_cus_xy2cfjgj54'
@@ -45,21 +47,17 @@ module.exports.place_order = (event, context, callback) => {
     });
   } catch(e) {
     if(e.name == 'ValidationError'){
-
-      console.log('msg -', e.message);
+      //console.log('msg -', e.message);
       callback(null,{
         statusCode: 500,
-        body: JSON.stringify({
-          error: {
-            name: e.name,
-            message: e.message
-          }
-        })
+        body: JSON.stringify(
+          { error: { name: e.name }}
+        ),
       });
     }
     else {
-      console.log(e.name)
-      console.log('ERROR - ', e)
+      //console.log(e.name)
+      //console.log('ERROR - ', e)
       callback(null,{
         statusCode: 500,
         body: JSON.stringify({
