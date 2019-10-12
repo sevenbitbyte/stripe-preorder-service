@@ -17,6 +17,7 @@
     "joi": "^14.3.1",
     "morgan": "^1.9.1",
     "nodemon": "^1.19.3",
+    "serverless-offline": "^5.12.0",
     "stripe": "^7.10.0"
   },
   "scripts": {
