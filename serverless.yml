@@ -8,7 +8,7 @@ provider:
 plugins:
   - serverless-offline
 functions:
-  app:
+  place-order:
     handler: src/endpoints/place-order.place_order
     events: 
       - http: 
