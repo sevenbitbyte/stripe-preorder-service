@@ -1,7 +1,7 @@
-const Joi = require('joi')
+const Joi = require('@hapi/joi')
 const DefaultConfig = require('../default-config')
 
-const validator = Joi.object().keys({
+const schema = Joi.object().keys({
   source: Joi.string().required(),
   email: Joi.string().email().required(),
   
@@ -23,14 +23,18 @@ const validator = Joi.object().keys({
   }
 });
 
-module.exports.place_order = (event, context, callback) => {
+module.exports.place_order = async (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false; 
 
+  
+
   try {
-    const valid = Joi.validate(event.body, validator);
-    //console.log(valid);
+  
+    const valid = await schema.validateAsync(event.body || {})
+    console.log('valid',valid)
+
     callback(null,{
-      statusCode: 500,
+      statusCode: 200,
       body: JSON.stringify({
         customer: {
           id: 'st_cus_xy2cfjgj54'
