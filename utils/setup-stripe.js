@@ -11,25 +11,24 @@ const PRODUCTS = {
       name: 'processor',
       description: 'Processor Type',
       type: 'good',
-      shippable: true,
-      active: true,
-      attributes: ['lora', 'processor']
+      attributes: ['model']
     },
     sku: {
       gr8: {
-        price: 0,
+        price: 100,
         active: true,
         attributes: {
-          processor: 'gr8'
+          model: 'gr8'
         },
         inventory: {
           type: 'finite',
-          quantity: 450
+          quantity: 450,
+          value: null
         }
       }
     }
   },
-  pocket: {
+  'pocket-pc': {
     product: {
       name: 'pocket-pc',
       description: 'Pocket Popcorn Computer',
@@ -45,7 +44,8 @@ const PRODUCTS = {
         attributes: {
           sku: 1,
           lora: false,
-          processor: 'gr8'
+          processor: 'gr8',
+          'rf-region': null
         }
       },
       'pocket-pc-lora': {
@@ -113,56 +113,144 @@ class ProductSKUListing {
     }
 
     this.productNameIdMap = {}
+    this.productIds = []
+    this.skuIds = []
   }
 
 
-  async addProducts(products){
+  hasProduct(id){
+    return this.productIds.indexOf(id) > -1
+  }
+
+
+  hasSKU(id){
+    return this.skuIds.indexOf(id) > -1
+  }
+
+  getProduct(id){
+    if(!this.hasProduct(id)){ return null }
+
+    for(const product of this.cache.products){
+      if(product.id == id){
+        return product
+      }
+    }
+
+    return null
+  }
+
+  getSKU(id){
+    if(!this.hasSKU(id)){ return null }
+
+    for(const sku of this.cache.sku){
+      if(sku.id == id){
+        return sku
+      }
+    }
     
+    return null
+  }
+  
+  async pull(){
     this.cache.products = (await this.stripe.products.list()).data
     this.cache.sku = (await this.stripe.skus.list()).data
 
+    this.productNameIdMap = {}
+    this.productIds = []
+    this.skuIds = []
 
-    this.cache.products.map(cloudProduct=>{ this.productNameIdMap[cloudProduct.name] = cloudProduct.id })
+    this.cache.products.map(cloudProduct=>{ 
+      this.productNameIdMap[cloudProduct.name] = cloudProduct.id
+      this.productIds.push(cloudProduct.id)
+    })
+
+    this.cache.sku.map(cloudSku=>{ 
+      this.skuIds.push(cloudSku.id)
+    })
+
+    /*for(const p of this.cache.products){
+      debug('delete', p.id)
+      await this.stripe.products.del(p.id)
+    }
+
+    for(const s of this.cache.sku){
+      debug('delete', s.id)
+      await this.stripe.skus.del(s.id)
+    }
+
+    process.exit()*/
+  }
+
+  async addProducts(products){
+    
+    await this.pull()
 
     const productList = Object.keys(products).map(k=>Hoek.reach(products, k))
   
-    productList.map( async (product)=>{
+    /*productList.map( async (product)=>{
       await this.addProduct(product.product, product.sku)
-    })
+    })*/
+
+    for(const product of productList){
+      debug('product', product.product.name)
+      await this.addProduct(product.product, product.sku)
+    }
+
+    await this.pull()
 
     return this.cache
   }
 
-  async addProduct(details, sku){
 
-    let cloudProductId = this.productNameIdMap[details.name]
-    if(cloudProductId){
-      debug('\t skip product', details.name, cloudProductId)
+  async addProduct(details, skus){
+
+    //let cloudProductId = this.productNameIdMap[details.name]
+    let cloudProduct = this.getProduct(details.name)
+    if(cloudProduct !== null){
+      debug('\t skip product', details.name)
     }
     else{
       
       debug('\t add product', details.name)
 
-      const cloudProduct = await this.stripe.products.create(details)
-
-      this.productNameIdMap[cloudProduct.name] = cloudProduct.id
+      cloudProduct = await this.stripe.products.create({
+        id: details.name,
+        ...details
+      })
     }
 
-    
+    let skuPromises = []
+
+    debug(cloudProduct)
+
+    for(const skuId of Object.keys(skus)){
+      debug('\t\tconsider sku', skuId)
+
+      let cloudSku = this.getSKU(skuId)
+
+      if(!cloudSku){
+        const sku = {
+          id: skuId,
+          currency: 'usd',
+          inventory: skus[skuId].inventory || {type:'bucket', value: 'in_stock'},
+          product: cloudProduct.id,
+          ...skus[skuId]
+        }
+
+        debug('\t\t',skuId, sku)
+
+        await this.addSKU(sku)
+      }
+    }
+
   }
 
-  async addSKU(productNameOrId, details){
-    let cloudSkuId = this.skuNameIdMap[details.name]
-    if(cloudProductId){
-      debug('\t skip product', details.name, cloudProductId)
-      return
-    }
 
-    debug('\t add product', details.name)
+  async addSKU(details){
 
-    const cloudProduct = await this.stripe.products.create(details)
+    debug('\t add sku', details.id)
 
-    this.productNameIdMap[cloudProduct.name] = cloudProduct.id
+    const cloudSku = await this.stripe.skus.create(details)
   }
 
   async getInventory(){}
@@ -179,8 +267,8 @@ async function main(){
 
   let productListing = new ProductSKUListing(stripe)
 
-  console.log(BUNDLES)
-  console.log(PRODUCTS)
+  debug('bundles', BUNDLES)
+  debug('products', PRODUCTS)
 
   const cloudProducts = await productListing.addProducts(PRODUCTS)
 
