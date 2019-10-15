@@ -15,7 +15,7 @@ const PRODUCTS = {
     },
     sku: {
       gr8: {
-        price: 100,
+        price: 0,
         active: true,
         attributes: {
           model: 'gr8'
@@ -168,17 +168,19 @@ class ProductSKUListing {
       this.skuIds.push(cloudSku.id)
     })
 
-    /*for(const p of this.cache.products){
-      debug('delete', p.id)
-      await this.stripe.products.del(p.id)
-    }
 
-    for(const s of this.cache.sku){
-      debug('delete', s.id)
+    /*for(const s of this.cache.sku){
+      debug('delete sku', s.id)
       await this.stripe.skus.del(s.id)
     }
 
-    process.exit()*/
+    for(const p of this.cache.products){
+      debug('delete product', p.id)
+      await this.stripe.products.del(p.id)
+    }
+
+
+    process.exit() */
   }
 
   async addProducts(products){
