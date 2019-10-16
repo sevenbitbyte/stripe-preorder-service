@@ -80,7 +80,7 @@ const PRODUCTS = {
       attributes: ['processor', 'sku']
     },
     sku: {
-      'original': {
+      'original-popcorn': {
         price: 4900,
         active: true,
         attributes: {
