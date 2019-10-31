@@ -1,7 +1,13 @@
 const promisify = require('util').promisify
+const AWS = require('aws-sdk')
 const Axios = require('axios')
 const jsonwebtoken = require('jsonwebtoken')
 const jwkToPem = require('jwk-to-pem')
+const jsonQuery = require('json-query')
+const Hoek = require('@hapi/hoek')
+
+AWS.config.update({region: 'us-east-1'});
+const Cognito = new AWS.CognitoIdentityServiceProvider();
 
 const cognitoPoolId = 'us-east-1_n5Lw6eoal';
 if (!cognitoPoolId) {
@@ -55,11 +61,43 @@ const handler = async (request) => {
       throw new Error('claim use is not access');
     }
     console.log(`claim confirmed for ${claim.username}`);
+    
     result = {userName: claim.username, clientId: claim.client_id, isValid: true};
+
+    const userInfo = await new Promise((resolve, reject)=>{
+      Cognito.getUser({
+        AccessToken: token
+      }, (err, data)=>{
+        if(!err){resolve(data)}
+        else{reject(err)}
+      })
+    })
+
+    result.email = Hoek.reach(
+      jsonQuery('UserAttributes[Name=email]', {data: userInfo}),
+      'value.Value'
+    )
+
+    result.emailVerified = Hoek.reach(
+      jsonQuery('UserAttributes[Name=email_verified]', {data: userInfo}),
+      'value.Value'
+    ) === 'true'
+    
+    
   } catch (error) {
     result = {userName: '', clientId: '', error, isValid: false};
   }
   return result;
 }
+
+/*
+{
+  userName: 'foo',
+  clientId: 'foobarbazbing',
+  isValid: true,
+  email: 'foo.bar@baz.com',
+  emailVerified: true
+}
+ */
 
 module.exports = handler
