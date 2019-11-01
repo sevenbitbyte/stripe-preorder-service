@@ -1,5 +1,5 @@
 const Joi = require('@hapi/joi')
-const Hoek =require('hoek')
+const Hoek =require('@hapi/hoek')
 const debug = require('debug')('place-order')
 const Stripe = require('stripe')
 

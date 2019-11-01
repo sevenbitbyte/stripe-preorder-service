@@ -19,3 +19,16 @@ functions:
           path: api/v1/place-order
           method: PUT
           cors: true
+  funding-status:
+    handler: src/endpoints/funding-status.funding_status
+    events: 
+      - http: 
+          path: api/v1/funding-status
+          method: GET
+          cors:
+            origins:
+              - http://localhost
+          response:
+            headers:
+              - Access-Control-Allow-Origin: '*'
+
