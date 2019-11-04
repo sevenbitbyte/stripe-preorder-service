@@ -25,7 +25,6 @@
     "stripe": "^7.10.0"
   },
   "scripts": {
-    "watch": "COMMIT_HASH=`git rev-parse HEAD` DEBUG=preorder* nodemon --watch ./src  src/index.js",
-    "invoke": "npx serverless invoke local --function place-order"
+    "start": "serverless  offline -P 4000",
   }
 }

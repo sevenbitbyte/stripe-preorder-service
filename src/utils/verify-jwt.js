@@ -33,11 +33,11 @@ const getPublicKeys = async () => {
 
 const verifyPromised = promisify(jsonwebtoken.verify.bind(jsonwebtoken));
 
-const handler = async (request) => {
+const handler = async (token) => {
   let result = null
   try {
-    console.log(`user claim verfiy invoked for ${JSON.stringify(request)}`);
-    const token = request.token;
+    console.log(`user claim verfiy invoked for ${token}`);
+    //const token = request.token;
     const tokenSections = (token || '').split('.');
     if (tokenSections.length < 2) {
       throw new Error('requested token is invalid');
