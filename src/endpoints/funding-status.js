@@ -7,6 +7,8 @@ const DefaultConfig = require('../default-config')
 
 let stripe = Stripe(process.env.STRIPE_KEY)
 
+
+
 module.exports.funding_status = async (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false; 
 
@@ -17,8 +19,8 @@ module.exports.funding_status = async (event, context, callback) => {
         'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
       },
       body: JSON.stringify({
-        funding: 15000,
-        goal: 50000,
+        funding: 1000,
+        goal: 49900,
         accepting: true,
         start: moment().startOf('isoWeek').toDate(),
         end: moment().endOf('isoWeek').toDate()
