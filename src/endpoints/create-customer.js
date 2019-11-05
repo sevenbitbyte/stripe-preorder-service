@@ -50,8 +50,9 @@ module.exports.create_customer = async (event, context, callback) => {
   const findByEmail = await stripe.customers.list({ email: verification.email })
   let customerStripeId = null
 
-  if(findByEmail && findByEmail.length > 0){
-    customerStripeId = findByEmail[0].id
+  if(findByEmail.data && findByEmail.data.length > 0){
+    customerStripeId = findByEmail.data[0].id
+
     debug('found stripe user', customerStripeId)
   } else {
     
