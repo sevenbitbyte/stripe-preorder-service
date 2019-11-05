@@ -33,8 +33,8 @@ module.exports.has_account = async (event, context, callback) => {
   const findByEmail = await stripe.customers.list({ email: verification.email })
   let customerStripeId = null
 
-  if(findByEmail && findByEmail.length > 0){
-    customerStripeId = findByEmail[0].id
+  if(findByEmail.data && findByEmail.data.length > 0){
+    customerStripeId = findByEmail.data[0].id
     console.log('found stripe user', customerStripeId)
   } else {
     console.log('no stripe user')
