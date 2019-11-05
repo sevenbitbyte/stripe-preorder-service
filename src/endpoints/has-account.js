@@ -30,6 +30,16 @@ module.exports.has_account = async (event, context, callback) => {
 
   console.log(verification)
 
+  const findByEmail = await stripe.customers.list({ email: verification.email })
+  let customerStripeId = null
+
+  if(findByEmail && findByEmail.length > 0){
+    customerStripeId = findByEmail[0].id
+    console.log('found stripe user', customerStripeId)
+  } else {
+    console.log('no stripe user')
+  }
+
   return {
     statusCode: 200,
     headers: {
@@ -41,7 +51,8 @@ module.exports.has_account = async (event, context, callback) => {
       userName: verification.userName,
       clientId: verification.clientId,
       email: verification.email,
-      emailVerified: verification.emailVerified
+      emailVerified: verification.emailVerified,
+      customerId: customerStripeId
     })
   }
 }
