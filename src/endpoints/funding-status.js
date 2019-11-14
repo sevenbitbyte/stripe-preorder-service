@@ -36,9 +36,9 @@ const crawlOrderStatus = async () => {
     orders.data.map((val, idx, arr)=>{
       if(val.status == 'paid' || val.status == 'fulfilled' || val.status == 'refunded')
       totalAmount += val.amount
+      totalOrders++
     })
 
-    totalOrders++
   }
 
   debug('total raised -', totalAmount, 'on', totalOrders, 'orders')
