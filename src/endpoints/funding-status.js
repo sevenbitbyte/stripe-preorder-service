@@ -8,7 +8,7 @@ const DefaultConfig = require('../default-config')
 let stripe = Stripe(process.env.STRIPE_KEY)
 
 let cacheTotalAmount = undefined
-let lastUpdate = moment()
+let lastUpdate = new moment()
 
 
 const crawlOrderStatus = async () => {
@@ -51,15 +51,19 @@ crawlOrderStatus().then(debug)
 module.exports.funding_status = async (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false; 
 
-  const deltaTime = lastUpdate.diff(moment())
+  const deltaTime = Math.abs( moment().diff(lastUpdate, 'seconds') )
 
-  if(cacheTotalAmount === undefined || deltaTime > 600){
+  if(cacheTotalAmount === undefined || deltaTime > 60){
+    debug('update', deltaTime)
     cacheTotalAmount = await crawlOrderStatus()
-    lastUpdate = moment()
+    lastUpdate = new moment()
+  }
+  else{
+    debug('from cache')
   }
   
 
-  callback(null,{
+  return {
     statusCode: 200,
     headers: {
       'Access-Control-Allow-Origin': '*', // Required for CORS support to work
@@ -72,5 +76,5 @@ module.exports.funding_status = async (event, context, callback) => {
       start: moment().startOf('isoWeek').toDate(),
       end: moment().endOf('isoWeek').toDate()
     })
-  });
+  }
 }
