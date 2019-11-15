@@ -3,10 +3,7 @@ const debug = require('debug')('funding-status')
 const Stripe = require('stripe')
 const moment = require('moment')
 
-const verifyJwt = require('../utils/verify-jwt')
-const DefaultConfig = require('../default-config')
-
-let stripe = Stripe(process.env.STRIPE_KEY)
+const lookupAccount = require('../utils/lookup-account')
 
 const schema = Joi.object().keys({
   jwt: Joi.string().required(),
@@ -24,21 +21,7 @@ module.exports.has_account = async (event, context, callback) => {
     schema
   )
 
-  console.log(valid)
-
-  const verification = await verifyJwt(valid.jwt)
-
-  console.log(verification)
-
-  const findByEmail = await stripe.customers.list({ email: verification.email })
-  let customerStripeId = null
-
-  if(findByEmail.data && findByEmail.data.length > 0){
-    customerStripeId = findByEmail.data[0].id
-    console.log('found stripe user', customerStripeId)
-  } else {
-    console.log('no stripe user')
-  }
+  const accountInfo = await LookupAccount(valid.jwt)
 
   return {
     statusCode: 200,
@@ -46,14 +29,7 @@ module.exports.has_account = async (event, context, callback) => {
       'Access-Control-Allow-Origin': '*', // Required for CORS support to work
       'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
     },
-    body: JSON.stringify({
-      isValid: verification.isValid,
-      userName: verification.userName,
-      clientId: verification.clientId,
-      email: verification.email,
-      emailVerified: verification.emailVerified,
-      customerId: customerStripeId
-    })
+    body: JSON.stringify(accountInfo)
   }
 }
 
