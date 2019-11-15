@@ -3,7 +3,7 @@ const debug = require('debug')('funding-status')
 const Stripe = require('stripe')
 const moment = require('moment')
 
-const lookupAccount = require('../utils/lookup-account')
+const LookupAccount = require('../utils/lookup-account')
 
 const schema = Joi.object().keys({
   jwt: Joi.string().required(),
