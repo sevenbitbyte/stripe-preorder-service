@@ -74,7 +74,8 @@ module.exports.funding_status = async (event, context, callback) => {
       goal: 49900,
       accepting: true,
       start: moment().startOf('isoWeek').toDate(),
-      end: moment().endOf('isoWeek').toDate()
+      end: moment().endOf('isoWeek').toDate(),
+      ts: moment()
     })
   }
 }
