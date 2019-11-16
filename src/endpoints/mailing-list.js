@@ -1,17 +1,38 @@
 const Joi = require('@hapi/joi')
-const debug = require('debug')('create-card')
+const debug = require('debug')('mailing-list')
 const Stripe = require('stripe')
 const moment = require('moment')
 
 let stripe = Stripe(process.env.STRIPE_KEY)
+let sendy = new Sendy(process.env.SENDY_URL, process.env.SENDY_KEY)
+const SendyList = process.env.SENDY_LIST
 
 const LookupAccount = require('../utils/lookup-account')
 
 const schema = Joi.object().keys({
-  jwt: Joi.string().required(),
+  email: Joi.string().email().required(),
 });
 
-module.exports.create_card = async (event, context, callback) => {
+const SendySubscribe = async (email)=>{
+  return new Promise((resolve, reject)=>{
+
+    sendy.subscribe({
+      email: email,
+      list_id: SendyList
+    }, (err, result)=>{
+
+      if(err){
+        return reject(err)
+      }
+
+      return resolve(result)
+
+    })
+  })
+  
+}
+
+module.exports.mailing_list = async (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false; 
 
   console.log('has account')
@@ -23,21 +44,10 @@ module.exports.create_card = async (event, context, callback) => {
     schema
   )
 
-  const accountInfo = await LookupAccount(valid.jwt)
+  
+  const subscribeStatus = await SendySubscribe(valid.email)
 
-  if(!accountInfo.customerId){ return }
-
-  const sources = await stripe.customers.listSources( accountInfo.customerId, {object:'card'} )
-
-  if(sources.data.length > 0){
-    // found existing source
-  }
-  else {
-    // create new source
-  }
-
-  // reply with source id
-
+  debug(subscribeStatus)
 
   return {
     statusCode: 200,
