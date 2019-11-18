@@ -1,6 +1,6 @@
 const Joi = require('@hapi/joi')
 const Hoek =require('@hapi/hoek')
-const debug = require('debug')('create-order')
+const debug = require('debug')('pay-order')
 const Stripe = require('stripe')
 
 const DefaultConfig = require('../default-config')
@@ -10,22 +10,11 @@ let stripe = Stripe(process.env.STRIPE_KEY)
 
 const schema = Joi.object().keys({
   jwt: Joi.string().required(),
-  products: Joi.array().items(
-    Joi.object().keys({
-      // Product
-      sku: Joi.string().allow(
-        'pocket-pc',
-        'pocket-pc-lora',
-      ).required(),
-      quantity: Joi.number().required()
-    }).required()
-  )
+  orderId: Joi.string().required()
 });
 
 
-
-
-module.exports.has_account = async (event, context, callback) => {
+module.exports.pay_order = async (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false; 
 
   console.log('has account')
@@ -42,22 +31,12 @@ module.exports.has_account = async (event, context, callback) => {
   if(!accountInfo.customerId){  throw new Error('no stripe customer') }
   if(!accountInfo.emailVerified){  throw new Error('not verified') }
 
-  const items = valid.products.map( product => {
-    return {
-      type: 'sku',
-      parent: product.sku,
-      quantity: product.quantity
-    }
-  })
+  debug('paying order', valid.orderId, accountInfo.customerId, accountInfo.email)
 
-  // Create order
-  const order = await stripe.orders.create({
-    items,
-    currency: 'usd',
-    customer: accountInfo.customerId
-  })
-
-
+  const order = await stripe.orders.pay(
+    valid.orderId,
+    { customer: accountInfo.customerId }
+  )
 
   return {
     statusCode: 200,

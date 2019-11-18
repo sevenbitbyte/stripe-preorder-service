@@ -7,8 +7,6 @@ let stripe = Stripe(process.env.STRIPE_KEY)
 let sendy = new Sendy(process.env.SENDY_URL, process.env.SENDY_KEY)
 const SendyList = process.env.SENDY_LIST
 
-const LookupAccount = require('../utils/lookup-account')
-
 const schema = Joi.object().keys({
   email: Joi.string().email().required(),
 });
@@ -55,6 +53,8 @@ module.exports.mailing_list = async (event, context, callback) => {
       'Access-Control-Allow-Origin': '*', // Required for CORS support to work
       'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
     },
-    body: JSON.stringify(accountInfo)
+    body: JSON.stringify({
+      joined: true
+    })
   }
 }
