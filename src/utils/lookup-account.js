@@ -18,6 +18,8 @@ const LookupAccount = async (jwt)=>{
   if(findByEmail.data && findByEmail.data.length > 0){
 
     customerStripeId = findByEmail.data[0].id
+    stripeSourceId = findByEmail.data[0].default_source
+    
     debug('found stripe user', customerStripeId)
 
     //read source id
@@ -35,7 +37,7 @@ const LookupAccount = async (jwt)=>{
     email: verification.email,
     emailVerified: verification.emailVerified,
     customerId: customerStripeId,
-    sourceId: stripeSourceId
+    sourceId: stripeSourceId,
   }
 }
 

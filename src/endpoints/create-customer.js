@@ -5,8 +5,10 @@ const moment = require('moment')
 
 const verifyJwt = require('../utils/verify-jwt')
 const DefaultConfig = require('../default-config')
+const LookupAccount = require('../utils/lookup-account')
 
 let stripe = Stripe(process.env.STRIPE_KEY)
+
 
 const schema = Joi.object().keys({
   jwt: Joi.string().required(),
@@ -46,29 +48,26 @@ module.exports.create_customer = async (event, context, callback) => {
   const verification = await verifyJwt(valid.jwt)
 
   debug(verification)
+  
+  const account = await LookupAccount(valid.jwt)
 
-  const findByEmail = await stripe.customers.list({ email: verification.email })
-  let customerStripeId = null
-
-  if(findByEmail.data && findByEmail.data.length > 0){
-    customerStripeId = findByEmail.data[0].id
-
-    debug('found stripe user', customerStripeId)
-  } else {
-    
-
+  if(!account.customerId){
     debug('creating user', valid.customer.email)
 
     const customerData = await stripe.customers.create({
       ...valid.customer,
-      description: 'PocketPC customer'
+      description: 'PocketPC Customer'
     })
 
-    customerStripeId = customerData.id
+    account.customerId = customerData.id
 
-    debug('created user', valid.customer.email, customerStripeId)
+    debug('created user', valid.customer.email, account.customerId)
 
-  }
+  } else{
+
+    debug('found stripe user', account.customerId, account.email)
+    
+   }
 
   return {
     statusCode: 200,
@@ -76,13 +75,7 @@ module.exports.create_customer = async (event, context, callback) => {
       'Access-Control-Allow-Origin': '*', // Required for CORS support to work
       'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
     },
-    body: JSON.stringify({
-      isValid: verification.isValid,
-      userName: verification.userName,
-      clientId: verification.clientId,
-      email: verification.email,
-      emailVerified: verification.emailVerified,
-      customerId: customerStripeId
-    })
+    body: JSON.stringify(account)
   }
 }
+

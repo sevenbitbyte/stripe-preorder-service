@@ -9,6 +9,13 @@ const LookupAccount = require('../utils/lookup-account')
 
 const schema = Joi.object().keys({
   jwt: Joi.string().required(),
+  card:{
+    exp_month: Joi.number().required(),
+    exp_year: Joi.number().required(),
+    number: Joi.string().required(),     //! credit card number
+    cvc: Joi.string().required(),
+    name: Joi.string()
+  }
 });
 
 module.exports.create_card = async (event, context, callback) => {
@@ -27,6 +34,7 @@ module.exports.create_card = async (event, context, callback) => {
 
   if(!accountInfo.customerId){ return }
 
+  let card = null
   const sources = await stripe.customers.listSources( accountInfo.customerId, {object:'card'} )
 
   if(sources.data.length > 0){
@@ -34,6 +42,11 @@ module.exports.create_card = async (event, context, callback) => {
   }
   else {
     // create new source
+    debug('creating new source for customer', accountInfo.customerId, accountInfo.email)
+    card = await stripe.customers.createSource( 
+      accountInfo.customerId,
+      { source: valid.card }
+    )
   }
 
   // reply with source id
@@ -45,6 +58,8 @@ module.exports.create_card = async (event, context, callback) => {
       'Access-Control-Allow-Origin': '*', // Required for CORS support to work
       'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
     },
-    body: JSON.stringify(accountInfo)
+    body: JSON.stringify({
+      cardId: card.id
+    })
   }
 }
