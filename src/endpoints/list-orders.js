@@ -9,7 +9,7 @@ const schema = Joi.object().keys({
   jwt: Joi.string().required(),
 });
 
-module.exports.has_account = async (event, context, callback) => {
+module.exports.list_orders = async (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false; 
 
   console.log('has account')

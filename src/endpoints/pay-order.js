@@ -14,7 +14,7 @@ const schema = Joi.object().keys({
 });
 
 
-module.exports.has_account = async (event, context, callback) => {
+module.exports.pay_order = async (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false; 
 
   console.log('has account')

@@ -8,18 +8,6 @@ provider:
 plugins:
   - serverless-offline
 functions:
-  place-order:
-    handler: src/endpoints/place-order.place_order
-    events: 
-      - http: 
-          path: api/v1/place-order
-          method: POST
-          cors:
-            origins:
-              - http://localhost
-          response:
-            headers:
-              - Access-Control-Allow-Origin: '*'
   funding-status:
     handler: src/endpoints/funding-status.funding_status
     events: 
@@ -80,5 +68,39 @@ functions:
           response:
             headers:
               - Access-Control-Allow-Origin: '*'
-
-
+  create-order:
+    handler: src/endpoints/create-order.create_order
+    events: 
+      - http: 
+          path: api/v1/create-order
+          method: POST
+          cors:
+            origins:
+              - http://localhost
+          response:
+            headers:
+              - Access-Control-Allow-Origin: '*'
+  pay-order:
+    handler: src/endpoints/pay-order.pay_order
+    events: 
+      - http: 
+          path: api/v1/pay-order
+          method: POST
+          cors:
+            origins:
+              - http://localhost
+          response:
+            headers:
+              - Access-Control-Allow-Origin: '*'
+  list-orders:
+    handler: src/endpoints/list-orders.list_orders
+    events: 
+      - http: 
+          path: api/v1/list-orders
+          method: POST
+          cors:
+            origins:
+              - http://localhost
+          response:
+            headers:
+              - Access-Control-Allow-Origin: '*'
