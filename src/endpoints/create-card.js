@@ -14,7 +14,13 @@ const schema = Joi.object().keys({
     exp_year: Joi.number().required(),
     number: Joi.string().required(),     //! credit card number
     cvc: Joi.string().required(),
-    name: Joi.string()
+    name: Joi.string(),
+    address_line1: Joi.string().required(),
+    address_line2: Joi.string(),
+    address_city: Joi.string(),
+    address_state: Joi.string(),
+    address_postal_code: Joi.string(),
+    address_country: Joi.string(),
   }
 });
 
@@ -45,8 +51,12 @@ module.exports.create_card = async (event, context, callback) => {
     // create new source
     debug('creating new source for customer', accountInfo.customerId, accountInfo.email)
     card = await stripe.customers.createSource( 
-      accountInfo.customerId,
-      { source: valid.card }
+      accountInfo.customerId,{
+        source: {
+        ...valid.card,
+        object: 'card'
+       }
+      }
     )
   }
 
