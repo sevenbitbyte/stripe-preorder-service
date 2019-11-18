@@ -51,6 +51,8 @@ module.exports.create_customer = async (event, context, callback) => {
   
   const account = await LookupAccount(valid.jwt)
 
+  if(!accountInfo.emailVerified){  throw new Error('not verified') }
+
   if(!account.customerId){
     debug('creating user', valid.customer.email)
 
@@ -66,7 +68,7 @@ module.exports.create_customer = async (event, context, callback) => {
   } else{
 
     debug('found stripe user', account.customerId, account.email)
-    
+
    }
 
   return {

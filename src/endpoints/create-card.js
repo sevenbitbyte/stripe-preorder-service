@@ -32,7 +32,8 @@ module.exports.create_card = async (event, context, callback) => {
 
   const accountInfo = await LookupAccount(valid.jwt)
 
-  if(!accountInfo.customerId){ return }
+  if(!accountInfo.customerId){  throw new Error('no stripe customer') }
+  if(!accountInfo.emailVerified){  throw new Error('not verified') }
 
   let card = null
   const sources = await stripe.customers.listSources( accountInfo.customerId, {object:'card'} )
