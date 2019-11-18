@@ -1,6 +1,6 @@
 const Joi = require('@hapi/joi')
 const Hoek =require('@hapi/hoek')
-const debug = require('debug')('place-order')
+const debug = require('debug')('create-order')
 const Stripe = require('stripe')
 
 const DefaultConfig = require('../default-config')
