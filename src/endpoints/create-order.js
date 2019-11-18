@@ -17,7 +17,7 @@ const schema = Joi.object().keys({
         'pocket-pc',
         'pocket-pc-lora',
       ).required(),
-      qty: Joi.number().required()
+      quantity: Joi.number().required()
     }).required()
   )
 });
@@ -46,7 +46,7 @@ module.exports.has_account = async (event, context, callback) => {
     return {
       type: 'sku',
       parent: product.sku,
-      quantity: product.qty
+      quantity: product.quantity
     }
   })
 
