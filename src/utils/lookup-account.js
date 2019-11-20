@@ -24,7 +24,6 @@ const LookupAccount = async (jwt)=>{
     
     debug('found stripe user', customerStripeId)
 
-    //read source id
 
   } else {
 

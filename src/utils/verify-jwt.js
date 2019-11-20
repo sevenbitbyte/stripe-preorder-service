@@ -89,7 +89,7 @@ const handler = async (token) => {
     
     
   } catch (error) {
-    result = {userName: '', clientId: '', error, isValid: false};
+    result = {userName: null, clientId: null, error, isValid: false};
   }
   return result;
 }
