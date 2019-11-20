@@ -27,8 +27,8 @@ See: [example/client-api.ts](example/client-api.ts)
 
 ### AWS Cognito
 
- * COGNITO_POOL_ID - Your cognito pool id
- * COGNITO_REGION - AWS region of your cognito pool
+ * `COGNITO_POOL_ID` - Your cognito pool id
+ * `COGNITO_REGION` - AWS region of your cognito pool
 
 ### Sendy
 
