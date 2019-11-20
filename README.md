@@ -1,6 +1,6 @@
 # stripe-preorder-service
 
-A simple stripe-preorder-service to learn serverless
+A simple stripe-preorder-service to learn serverless, cognito and stripe. Not sure its ready for prime time, use at your risk in production.
 
 
 ### Developing
