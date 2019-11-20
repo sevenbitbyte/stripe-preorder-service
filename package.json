@@ -22,8 +22,7 @@
     "sendy-api": "^0.1.0",
     "serverless-http": "^2.3.0",
     "serverless-offline": "^5.12.0",
-    "stripe": "^7.10.0",
-    "stripe-preorder0-model": "ssh://git@github.com:sevenbitbyte/stripe-preorder-model.git#master"
+    "stripe": "^7.10.0"
   },
   "scripts": {
     "start": "serverless  offline -P 4000"
