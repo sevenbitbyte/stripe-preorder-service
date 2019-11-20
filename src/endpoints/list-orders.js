@@ -26,7 +26,7 @@ module.exports.list_orders = async (event, context, callback) => {
   if(!accountInfo.customerId){  throw new Error('no stripe customer') }
   if(!accountInfo.emailVerified){  throw new Error('not verified') }
 
-  const orders = await Stripe.orders.list({
+  const orders = await stripe.orders.list({
     limit: 25,
     customer: accountInfo.customerId
   })
