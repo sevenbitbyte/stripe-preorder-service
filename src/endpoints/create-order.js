@@ -13,10 +13,7 @@ const schema = Joi.object().keys({
   products: Joi.array().items(
     Joi.object().keys({
       // Product
-      sku: Joi.string().allow(
-        'pocket-pc',
-        'pocket-pc-lora',
-      ).required(),
+      sku: Joi.string().required(),
       quantity: Joi.number().required()
     }).required()
   )
