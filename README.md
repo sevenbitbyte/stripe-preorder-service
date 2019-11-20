@@ -14,6 +14,10 @@ Then start service:
  * `yarn watch`
  
  Listens on [http://localhost:4000](http://localhost:4000)
+ 
+### Example Client
+
+See: [example/client-api.ts](example/client-api.ts)
 
 ## Configuration
 
