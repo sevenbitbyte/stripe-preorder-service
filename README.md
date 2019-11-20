@@ -10,6 +10,20 @@ Listens on [http://localhost:4000](http://localhost:4000)
  * `yarn`
  * `yarn watch`
 
+## Configuration
+
+### Stripe
+
+ * `STRIPE_KEY` - Stripe secret key
+
+### Sendy
+
+See `sendy-api` documentation from https://www.npmjs.com/package/sendy-api
+
+ * `SENDY_URL` - Sendy endpoint
+ * `SENDY_KEY` - Sendy secret key
+ * `SENDY_LIST` - Sendy list to add users to
+
 ## Endpoints
 
 ### GET /api/v1/funding-status

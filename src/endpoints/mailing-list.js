@@ -2,6 +2,7 @@ const Joi = require('@hapi/joi')
 const debug = require('debug')('mailing-list')
 const Stripe = require('stripe')
 const moment = require('moment')
+const Sendy = require('sendy-api')
 
 let stripe = Stripe(process.env.STRIPE_KEY)
 let sendy = new Sendy(process.env.SENDY_URL, process.env.SENDY_KEY)
@@ -20,6 +21,7 @@ const SendySubscribe = async (email)=>{
     }, (err, result)=>{
 
       if(err){
+        debug('subscribe error', err)
         return reject(err)
       }
 
@@ -43,7 +45,17 @@ module.exports.mailing_list = async (event, context, callback) => {
   )
 
   
-  const subscribeStatus = await SendySubscribe(valid.email)
+  let subscribeStatus = false
+  try{
+    subscribeStatus = await SendySubscribe(valid.email)
+  }
+  catch(err){
+    if(subscribeStatus instanceof Error){
+      subscribeStatus = err.message
+    } else {
+      subscribeStatus = err
+    }
+  }
 
   debug(subscribeStatus)
 
@@ -54,7 +66,8 @@ module.exports.mailing_list = async (event, context, callback) => {
       'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
     },
     body: JSON.stringify({
-      joined: true
+      joined: subscribeStatus === true,
+      error: (subscribeStatus !== true ? subscribeStatus : null)
     })
   }
 }
