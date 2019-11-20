@@ -1,14 +1,19 @@
 # stripe-preorder-service
 
-stripe-preorder-service
+A simple stripe-preorder-service to learn serverless
 
-
-Listens on [http://localhost:4000](http://localhost:4000)
 
 ### Developing
 
+ * Create products and SKU on stripe -> https://dashboard.stripe.com/test/orders/products/
+
+Then start service:
+
+
  * `yarn`
  * `yarn watch`
+ 
+ Listens on [http://localhost:4000](http://localhost:4000)
 
 ## Configuration
 
