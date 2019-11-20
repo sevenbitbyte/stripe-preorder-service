@@ -6,14 +6,18 @@ const jwkToPem = require('jwk-to-pem')
 const jsonQuery = require('json-query')
 const Hoek = require('@hapi/hoek')
 
-AWS.config.update({region: 'us-east-1'});
+const cognitoPoolId = process.env.COGNITO_POOL_ID || 'us-east-1_n5Lw6eoal';
+const cognitoRegion = process.env.COGNITO_REGION || 'us-east-1'
+
+AWS.config.update({region: cognitoRegion});
 const Cognito = new AWS.CognitoIdentityServiceProvider();
 
-const cognitoPoolId = 'us-east-1_n5Lw6eoal';
+
 if (!cognitoPoolId) {
   throw new Error('env var required for cognito pool');
 }
-const cognitoIssuer = `https://cognito-idp.us-east-1.amazonaws.com/${cognitoPoolId}`;
+
+const cognitoIssuer = `https://cognito-idp.${cognitoRegion}.amazonaws.com/${cognitoPoolId}`;
 
 let cacheKeys = null;
 const getPublicKeys = async () => {
