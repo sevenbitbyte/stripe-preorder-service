@@ -21,6 +21,10 @@ See: [example/client-api.ts](example/client-api.ts)
 
 ## Configuration
 
+### Serverless
+
+Modifiy [serverless.yml](serverless.yml) to suite your CORS requirements
+
 ### Stripe
 
  * `STRIPE_KEY` - Stripe secret key
