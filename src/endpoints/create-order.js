@@ -3,7 +3,6 @@ const Hoek =require('@hapi/hoek')
 const debug = require('debug')('create-order')
 const Stripe = require('stripe')
 
-const DefaultConfig = require('../default-config')
 const LookupAccount = require('../utils/lookup-account')
 
 let stripe = Stripe(process.env.STRIPE_KEY)
