@@ -3,8 +3,6 @@ const debug = require('debug')('funding-status')
 const Stripe = require('stripe')
 const moment = require('moment')
 
-const DefaultConfig = require('../default-config')
-
 let stripe = Stripe(process.env.STRIPE_KEY)
 
 let cacheTotalAmount = undefined

@@ -4,7 +4,6 @@ const Stripe = require('stripe')
 const moment = require('moment')
 
 const verifyJwt = require('../utils/verify-jwt')
-const DefaultConfig = require('../default-config')
 const LookupAccount = require('../utils/lookup-account')
 
 let stripe = Stripe(process.env.STRIPE_KEY)
