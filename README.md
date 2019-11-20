@@ -21,6 +21,11 @@ Then start service:
 
  * `STRIPE_KEY` - Stripe secret key
 
+### AWS Cognito
+
+ * COGNITO_POOL_ID - Your cognito pool id
+ * COGNITO_REGION - AWS region of your cognito pool
+
 ### Sendy
 
 See `sendy-api` documentation from https://www.npmjs.com/package/sendy-api
