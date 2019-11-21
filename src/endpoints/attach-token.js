@@ -12,7 +12,7 @@ const schema = Joi.object().keys({
   tokenId: Joi.string().required()
 });
 
-module.exports.create_card = async (event, context, callback) => {
+module.exports.attach_token = async (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false; 
 
   console.log('has account')
