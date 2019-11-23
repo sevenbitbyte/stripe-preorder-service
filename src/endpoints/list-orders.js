@@ -9,6 +9,8 @@ const schema = Joi.object().keys({
   jwt: Joi.string().required(),
 });
 
+let stripe = Stripe(process.env.STRIPE_KEY)
+
 module.exports.list_orders = async (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false; 
 
