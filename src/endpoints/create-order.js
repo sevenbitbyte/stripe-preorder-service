@@ -21,10 +21,10 @@ const schema = Joi.object().keys({
 
 
 
-module.exports.has_account = async (event, context, callback) => {
+module.exports.create_order = async (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false; 
 
-  console.log('has account')
+  console.log('create_order')
 
   console.log(event.body)
 
