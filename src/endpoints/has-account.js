@@ -7,28 +7,38 @@ const LookupAccount = require('../utils/lookup-account')
 
 const schema = Joi.object().keys({
   jwt: Joi.string().required(),
-});
+})
 
 module.exports.has_account = async (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false; 
+  context.callbackWaitsForEmptyEventLoop = false
 
   debug('has account')
 
   debug(event.body)
 
-  const valid = Joi.attempt(
-    JSON.parse(event.body),
-    schema
-  )
+  try {
+    const valid = Joi.attempt(JSON.parse(event.body), schema)
 
-  const accountInfo = await LookupAccount(valid.jwt)
+    const accountInfo = await LookupAccount(valid.jwt)
 
-  return {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-      'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
-    },
-    body: JSON.stringify(accountInfo)
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*', // Required for CORS support to work
+        'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
+      },
+      body: JSON.stringify(accountInfo),
+    }
+  } catch (e) {
+    return {
+      statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': '*', // Required for CORS support to work
+        'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
+      },
+      body: JSON.stringify({
+        error: e.message,
+      }),
+    }
   }
 }
