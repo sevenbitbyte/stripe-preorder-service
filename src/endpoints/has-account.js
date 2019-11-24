@@ -12,9 +12,9 @@ const schema = Joi.object().keys({
 module.exports.has_account = async (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false; 
 
-  console.log('has account')
+  debug('has account')
 
-  console.log(event.body)
+  debug(event.body)
 
   const valid = Joi.attempt(
     JSON.parse(event.body),
