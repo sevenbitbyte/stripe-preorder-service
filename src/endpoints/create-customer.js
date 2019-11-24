@@ -8,15 +8,14 @@ const LookupAccount = require('../utils/lookup-account')
 
 let stripe = Stripe(process.env.STRIPE_KEY)
 
-
 const schema = Joi.object().keys({
   jwt: Joi.string().required(),
   customer: {
-    name: Joi.string().required(),      //!required
-    email: Joi.string().required(),     //!required
+    name: Joi.string().required(), //!required
+    email: Joi.string().required(), //!required
     phone: Joi.string().allow(''),
     shipping: {
-      name: Joi.string().required(),    //!required by stripe
+      name: Joi.string().required(), //!required by stripe
       phone: Joi.string().allow(''),
       address: {
         line1: Joi.string().required(), //! required by stripe
@@ -25,58 +24,66 @@ const schema = Joi.object().keys({
         state: Joi.string().allow(''),
         postal_code: Joi.string().allow(''),
         country: Joi.string().allow(''),
-      }
-    }
-  }
-});
+      },
+    },
+  },
+})
 
 module.exports.create_customer = async (event, context, callback) => {
-  context.callbackWaitsForEmptyEventLoop = false; 
+  context.callbackWaitsForEmptyEventLoop = false
 
   debug('create_customer')
 
   debug(event.body)
 
-  const valid = Joi.attempt(
-    JSON.parse(event.body),
-    schema
-  )
+  try {
+    const valid = Joi.attempt(JSON.parse(event.body), schema)
 
-  debug(valid)
+    debug(valid)
 
-  const verification = await verifyJwt(valid.jwt)
+    const verification = await verifyJwt(valid.jwt)
 
-  debug(verification)
-  
-  const account = await LookupAccount(valid.jwt)
+    debug(verification)
 
-  if(!account.emailVerified){  throw new Error('not verified') }
+    const account = await LookupAccount(valid.jwt)
 
-  if(!account.customerId){
-    debug('creating user', valid.customer.email)
+    if (!account.emailVerified) {
+      throw new Error('not verified')
+    }
 
-    const customerData = await stripe.customers.create({
-      ...valid.customer,
-      description: 'PocketPC Customer'
-    })
+    if (!account.customerId) {
+      debug('creating user', valid.customer.email)
 
-    account.customerId = customerData.id
+      const customerData = await stripe.customers.create({
+        ...valid.customer,
+        description: 'PocketPC Customer',
+      })
 
-    debug('created user', valid.customer.email, account.customerId)
+      account.customerId = customerData.id
 
-  } else{
+      debug('created user', valid.customer.email, account.customerId)
+    } else {
+      debug('found stripe user', account.customerId, account.email)
+    }
 
-    debug('found stripe user', account.customerId, account.email)
-
-   }
-
-  return {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-      'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
-    },
-    body: JSON.stringify(account)
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*', // Required for CORS support to work
+        'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
+      },
+      body: JSON.stringify(account),
+    }
+  } catch (e) {
+    return {
+      statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': '*', // Required for CORS support to work
+        'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
+      },
+      body: JSON.stringify({
+        error: e.message,
+      }),
+    }
   }
 }
-
