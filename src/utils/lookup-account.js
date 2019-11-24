@@ -11,6 +11,8 @@ const LookupAccount = async (jwt)=>{
 
   const verification = await verifyJwt(jwt)
 
+  debug('jwt email', verification.email)
+
   const findByEmail = await stripe.customers.list({ email: verification.email })
   let customerStripeId = null
   let stripeSourceId = null
@@ -21,6 +23,9 @@ const LookupAccount = async (jwt)=>{
     customerStripeId = findByEmail.data[0].id
     stripeSourceId = findByEmail.data[0].default_source
     stripeAddress = findByEmail.data[0].address
+
+    debug('stripe keys', Object.keys(findByEmail.data[0]))
+    debug('shipping address', stripeAddress)
     
     debug('found stripe user', customerStripeId)
 

@@ -12,19 +12,19 @@ let stripe = Stripe(process.env.STRIPE_KEY)
 const schema = Joi.object().keys({
   jwt: Joi.string().required(),
   customer: {
-    name: Joi.string(),
-    email: Joi.string().required(),
-    phone: Joi.string(),
+    name: Joi.string().required(),      //!required
+    email: Joi.string().required(),     //!required
+    phone: Joi.string().allow(''),
     shipping: {
-      name: Joi.string().required(),
-      phone: Joi.string(),
+      name: Joi.string().required(),    //!required by stripe
+      phone: Joi.string().allow(''),
       address: {
-        line1: Joi.string().required(),
-        line2: Joi.string(),
-        city: Joi.string(),
-        state: Joi.string(),
-        postal_code: Joi.string(),
-        country: Joi.string(),
+        line1: Joi.string().required(), //! required by stripe
+        line2: Joi.string().allow(''),
+        city: Joi.string().allow(''),
+        state: Joi.string().allow(''),
+        postal_code: Joi.string().allow(''),
+        country: Joi.string().allow(''),
       }
     }
   }
@@ -33,7 +33,7 @@ const schema = Joi.object().keys({
 module.exports.create_customer = async (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false; 
 
-  debug('has account')
+  debug('create_customer')
 
   debug(event.body)
 
@@ -50,7 +50,7 @@ module.exports.create_customer = async (event, context, callback) => {
   
   const account = await LookupAccount(valid.jwt)
 
-  if(!accountInfo.emailVerified){  throw new Error('not verified') }
+  if(!account.emailVerified){  throw new Error('not verified') }
 
   if(!account.customerId){
     debug('creating user', valid.customer.email)

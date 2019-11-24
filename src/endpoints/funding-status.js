@@ -71,7 +71,7 @@ module.exports.funding_status = async (event, context, callback) => {
     },
     body: JSON.stringify({
       funding: cacheTotalAmount,
-      goal: 49900,
+      goal: 1,
       accepting: true,
       start: moment().startOf('isoWeek').toDate(),
       end: moment().endOf('isoWeek').toDate(),
