@@ -30,6 +30,7 @@ module.exports.has_account = async (event, context, callback) => {
       body: JSON.stringify(accountInfo),
     }
   } catch (e) {
+    debug(e)
     return {
       statusCode: 400,
       headers: {
@@ -37,7 +38,7 @@ module.exports.has_account = async (event, context, callback) => {
         'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
       },
       body: JSON.stringify({
-        error: e.message,
+        error: 'There was an error while processing this account. Please try again.',
       }),
     }
   }

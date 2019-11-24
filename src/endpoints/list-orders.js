@@ -44,6 +44,7 @@ module.exports.list_orders = async (event, context, callback) => {
       body: JSON.stringify(orders),
     }
   } catch (e) {
+    debug(e)
     return {
       statusCode: 400,
       headers: {
@@ -51,7 +52,7 @@ module.exports.list_orders = async (event, context, callback) => {
         'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
       },
       body: JSON.stringify({
-        error: e.message,
+        error: 'There was an error while getting the list of orders.',
       }),
     }
   }

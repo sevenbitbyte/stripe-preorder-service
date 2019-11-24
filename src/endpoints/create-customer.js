@@ -75,6 +75,7 @@ module.exports.create_customer = async (event, context, callback) => {
       body: JSON.stringify(account),
     }
   } catch (e) {
+    debug(e)
     return {
       statusCode: 400,
       headers: {
@@ -82,7 +83,7 @@ module.exports.create_customer = async (event, context, callback) => {
         'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
       },
       body: JSON.stringify({
-        error: e.message,
+        error: 'There was an error while creating the customer. Please check that all the fields are correct and try again.',
       }),
     }
   }

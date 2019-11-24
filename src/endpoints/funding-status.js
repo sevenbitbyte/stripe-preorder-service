@@ -83,6 +83,7 @@ module.exports.funding_status = async (event, context, callback) => {
       }),
     }
   } catch (e) {
+    debug(e)
     return {
       statusCode: 400,
       headers: {
@@ -90,7 +91,7 @@ module.exports.funding_status = async (event, context, callback) => {
         'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
       },
       body: JSON.stringify({
-        error: e.message,
+        error: 'There was an error while getting the funding status.',
       }),
     }
   }
