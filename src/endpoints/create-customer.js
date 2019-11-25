@@ -37,46 +37,63 @@ module.exports.create_customer = async (event, context, callback) => {
 
   debug(event.body)
 
-  const valid = Joi.attempt(
-    JSON.parse(event.body),
-    schema
-  )
+  try{
 
-  debug(valid)
+    const valid = Joi.attempt(
+      JSON.parse(event.body),
+      schema
+    )
 
-  const verification = await verifyJwt(valid.jwt)
+    debug(valid)
 
-  debug(verification)
-  
-  const account = await LookupAccount(valid.jwt)
+    const verification = await verifyJwt(valid.jwt)
 
-  if(!account.emailVerified){  throw new Error('not verified') }
+    debug(verification)
+    
+    const account = await LookupAccount(valid.jwt)
 
-  if(!account.customerId){
-    debug('creating user', valid.customer.email)
+    if(!account.emailVerified){  throw new Error('not verified') }
 
-    const customerData = await stripe.customers.create({
-      ...valid.customer,
-      description: 'PocketPC Customer'
-    })
+    if(!account.customerId){
+      debug('creating user', valid.customer.email)
 
-    account.customerId = customerData.id
+      const customerData = await stripe.customers.create({
+        ...valid.customer,
+        description: 'PocketPC Customer'
+      })
 
-    debug('created user', valid.customer.email, account.customerId)
+      account.customerId = customerData.id
 
-  } else{
+      debug('created user', valid.customer.email, account.customerId)
 
-    debug('found stripe user', account.customerId, account.email)
+    } else{
 
-   }
+      debug('found stripe user', account.customerId, account.email)
 
-  return {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*', // Required for CORS support to work
-      'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
-    },
-    body: JSON.stringify(account)
+    }
+
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
+        'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
+      },
+      body: JSON.stringify(account)
+    }
+
+  } catch (e) {
+    debug(e)
+    return {
+      statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
+        'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
+      },
+      body: JSON.stringify({
+        error: 'There was an error while creating the customer. Please check that all the fields are correct and try again.',
+      }),
+    }
+
   }
 }
 

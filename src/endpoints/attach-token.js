@@ -41,7 +41,7 @@ module.exports.attach_token = async (event, context, callback) => {
   return {
     statusCode: 200,
     headers: {
-      'Access-Control-Allow-Origin': '*', // Required for CORS support to work
+      'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
       'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
     },
     body: JSON.stringify({
