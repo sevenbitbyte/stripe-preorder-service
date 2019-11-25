@@ -6,6 +6,12 @@ provider:
   region: us-east-1
   memorySize: 128
 custom:
+  AllowOrigin_dev: '*'
+  AllowOrigin_prod: https://pocket.popcorncomputer.com
+  AllowOrigin_production: https://pocket.popcorncomputer.com
+  CORSOrigin_dev: http://localhost
+  CORSOrigin_prod: https://pocket.popcorncomputer.com
+  CORSOrigin_production: https://pocket.popcorncomputer.com
   AllowOrigin:
     dev: '*'
     prod: 'https://pocket.popcorncomputer.com'
@@ -23,10 +29,10 @@ functions:
           method: GET
           cors:
             origins:
-              - http://localhost
+              - ${self:custom.CORSOrigin_${opt:stage}}
           response:
             headers:
-              - Access-Control-Allow-Origin: '*'
+              - Access-Control-Allow-Origin: ${self:custom.AllowOrigin_${opt:stage}}
   has-account:
     handler: src/endpoints/has-account.has_account
     events: 

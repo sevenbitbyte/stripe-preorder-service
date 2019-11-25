@@ -25,6 +25,8 @@
     "stripe": "^7.10.0"
   },
   "scripts": {
-    "start": "serverless  offline -P 4000"
+    "start": "serverless  offline -P 4000",
+    "deploy": "serverless  deploy --stage dev",
+    "deploy-prod": "serverless  deploy --stage prod"
   }
 }

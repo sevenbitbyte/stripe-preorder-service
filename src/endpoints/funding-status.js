@@ -3,6 +3,10 @@ const debug = require('debug')('funding-status')
 const Stripe = require('stripe')
 const moment = require('moment')
 
+
+const FundAccepting = (process.env.FUND_ACCEPTING !== undefined) ? process.env.FUND_ACCEPTING == 'true' : false;
+const FundGoal = (process.env.FUND_GOAL !== undefined) ? process.env.FUND_GOAL : 50000;
+
 let stripe = Stripe(process.env.STRIPE_KEY)
 
 let cacheTotalAmount = undefined
@@ -71,8 +75,8 @@ module.exports.funding_status = async (event, context, callback) => {
     },
     body: JSON.stringify({
       funding: 0, //cacheTotalAmount,
-      goal: 1,
-      accepting: false,
+      goal: FundGoal,
+      accepting: FundAccepting,
       start: moment().startOf('isoWeek').toDate(),
       end: moment().endOf('isoWeek').toDate(),
       ts: moment()
