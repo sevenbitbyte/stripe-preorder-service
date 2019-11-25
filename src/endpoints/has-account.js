@@ -1,6 +1,5 @@
 const Joi = require('@hapi/joi')
 const debug = require('debug')('has-account')
-const Stripe = require('stripe')
 const moment = require('moment')
 
 const LookupAccount = require('../utils/lookup-account')
@@ -16,19 +15,37 @@ module.exports.has_account = async (event, context, callback) => {
 
   debug(event.body)
 
-  const valid = Joi.attempt(
-    JSON.parse(event.body),
-    schema
-  )
+  try{
 
-  const accountInfo = await LookupAccount(valid.jwt)
+    const valid = Joi.attempt(
+      JSON.parse(event.body),
+      schema
+    )
 
-  return {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
-      'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
-    },
-    body: JSON.stringify(accountInfo)
+    const accountInfo = await LookupAccount(valid.jwt)
+
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
+        'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
+      },
+      body: JSON.stringify(accountInfo)
+    }
+
+
+  } catch (e) {
+    debug('ERROR', e)
+    return {
+      statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
+        'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
+      },
+      body: JSON.stringify({
+        error: 'There was an error finding your account.',
+      }),
+    }
+
   }
 }

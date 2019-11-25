@@ -18,27 +18,45 @@ module.exports.list_orders = async (event, context, callback) => {
 
   console.log(event.body)
 
-  const valid = Joi.attempt(
-    JSON.parse(event.body),
-    schema
-  )
+  try{
 
-  const accountInfo = await LookupAccount(valid.jwt)
+    const valid = Joi.attempt(
+      JSON.parse(event.body),
+      schema
+    )
 
-  if(!accountInfo.customerId){  throw new Error('no stripe customer') }
-  if(!accountInfo.emailVerified){  throw new Error('not verified') }
+    const accountInfo = await LookupAccount(valid.jwt)
 
-  const orders = await stripe.orders.list({
-    limit: 25,
-    customer: accountInfo.customerId
-  })
+    if(!accountInfo.customerId){  throw new Error('no stripe customer') }
+    if(!accountInfo.emailVerified){  throw new Error('not verified') }
 
-  return {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
-      'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
-    },
-    body: JSON.stringify(orders)
+    const orders = await stripe.orders.list({
+      limit: 25,
+      customer: accountInfo.customerId
+    })
+
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
+        'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
+      },
+      body: JSON.stringify(orders)
+    }
+
+
+  } catch (e) {
+    debug('ERROR', e)
+    return {
+      statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
+        'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
+      },
+      body: JSON.stringify({
+        error: 'There was an error while listing orders.',
+      }),
+    }
+
   }
 }
