@@ -28,11 +28,8 @@ functions:
           path: api/v1/funding-status
           method: GET
           cors:
-            origins:
-              - ${self:custom.CORSOrigin_${opt:stage}}
-          response:
-            headers:
-              - Access-Control-Allow-Origin: ${self:custom.AllowOrigin_${opt:stage}}
+            enabled: true
+            origin: ${ ${env:CORS_ORIGIN}, '*'}
   has-account:
     handler: src/endpoints/has-account.has_account
     events: 
