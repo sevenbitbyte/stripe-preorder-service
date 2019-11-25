@@ -55,31 +55,48 @@ crawlOrderStatus().then(debug)
 module.exports.funding_status = async (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false; 
 
-  const deltaTime = Math.abs( moment().diff(lastUpdate, 'seconds') )
+  try{
+    const deltaTime = Math.abs( moment().diff(lastUpdate, 'seconds') )
 
-  if(cacheTotalAmount === undefined || deltaTime > 60){
-    debug('update', deltaTime)
-    cacheTotalAmount = await crawlOrderStatus()
-    lastUpdate = new moment()
-  }
-  else{
-    debug('from cache')
-  }
-  
+    if(cacheTotalAmount === undefined || deltaTime > 60){
+      debug('update', deltaTime)
+      cacheTotalAmount = await crawlOrderStatus()
+      lastUpdate = new moment()
+    }
+    else{
+      debug('from cache')
+    }
+    
 
-  return {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
-      'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
-    },
-    body: JSON.stringify({
-      funding: cacheTotalAmount,
-      goal: FundGoal,
-      accepting: FundAccepting,
-      start: moment().startOf('isoWeek').toDate(),
-      end: moment().endOf('isoWeek').toDate(),
-      ts: moment()
-    })
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
+        'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
+      },
+      body: JSON.stringify({
+        funding: cacheTotalAmount,
+        goal: FundGoal,
+        accepting: FundAccepting,
+        start: moment().startOf('isoWeek').toDate(),
+        end: moment().endOf('isoWeek').toDate(),
+        ts: moment()
+      })
+    }
+
+
+  } catch (e) {
+    debug('ERROR', e)
+    return {
+      statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
+        'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
+      },
+      body: JSON.stringify({
+        error: 'There was an error getting status.',
+      }),
+    }
+
   }
 }

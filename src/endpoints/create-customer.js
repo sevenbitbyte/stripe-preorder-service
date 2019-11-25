@@ -82,7 +82,7 @@ module.exports.create_customer = async (event, context, callback) => {
     }
 
   } catch (e) {
-    debug(e)
+    debug('ERROR', e)
     return {
       statusCode: 400,
       headers: {

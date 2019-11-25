@@ -20,32 +20,50 @@ module.exports.pay_order = async (event, context, callback) => {
 
   console.log(event.body)
 
-  const valid = Joi.attempt(
-    JSON.parse(event.body),
-    schema
-  )
+  try{
 
-  const accountInfo = await LookupAccount(valid.jwt)
+    const valid = Joi.attempt(
+      JSON.parse(event.body),
+      schema
+    )
 
-  if(!accountInfo.customerId){  throw new Error('no stripe customer') }
-  if(!accountInfo.emailVerified){  throw new Error('not verified') }
+    const accountInfo = await LookupAccount(valid.jwt)
 
-  debug('paying order', valid.orderId, accountInfo.customerId, accountInfo.email)
+    if(!accountInfo.customerId){  throw new Error('no stripe customer') }
+    if(!accountInfo.emailVerified){  throw new Error('not verified') }
 
-  const order = await stripe.orders.pay(
-    valid.orderId,
-    { customer: accountInfo.customerId }
-  )
+    debug('paying order', valid.orderId, accountInfo.customerId, accountInfo.email)
 
-  return {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
-      'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
-    },
-    body: JSON.stringify({
-      orderId: order.id,
-      order: order
-    })
+    const order = await stripe.orders.pay(
+      valid.orderId,
+      { customer: accountInfo.customerId }
+    )
+
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
+        'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
+      },
+      body: JSON.stringify({
+        orderId: order.id,
+        order: order
+      })
+    }
+
+
+  } catch (e) {
+    debug('ERROR', e)
+    return {
+      statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
+        'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
+      },
+      body: JSON.stringify({
+        error: 'There was an error while accepting payment.',
+      }),
+    }
+
   }
 }

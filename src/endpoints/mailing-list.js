@@ -39,35 +39,53 @@ module.exports.mailing_list = async (event, context, callback) => {
 
   console.log(event.body)
 
-  const valid = Joi.attempt(
-    JSON.parse(event.body),
-    schema
-  )
-
-  
-  let subscribeStatus = false
   try{
-    subscribeStatus = await SendySubscribe(valid.email)
-  }
-  catch(err){
-    if(subscribeStatus instanceof Error){
-      subscribeStatus = err.message
-    } else {
-      subscribeStatus = err
+
+    const valid = Joi.attempt(
+      JSON.parse(event.body),
+      schema
+    )
+
+    
+    let subscribeStatus = false
+    try{
+      subscribeStatus = await SendySubscribe(valid.email)
     }
-  }
+    catch(err){
+      if(subscribeStatus instanceof Error){
+        subscribeStatus = err.message
+      } else {
+        subscribeStatus = err
+      }
+    }
 
-  debug(subscribeStatus)
+    debug(subscribeStatus)
 
-  return {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
-      'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
-    },
-    body: JSON.stringify({
-      joined: subscribeStatus === true,
-      error: (subscribeStatus !== true ? subscribeStatus : null)
-    })
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
+        'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
+      },
+      body: JSON.stringify({
+        joined: subscribeStatus === true,
+        error: (subscribeStatus !== true ? subscribeStatus : null)
+      })
+    }
+
+
+  } catch (e) {
+    debug('ERROR', e)
+    return {
+      statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
+        'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
+      },
+      body: JSON.stringify({
+        error: 'There was an error during mailing list signup.',
+      }),
+    }
+
   }
 }

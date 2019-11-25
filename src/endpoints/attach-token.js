@@ -19,33 +19,49 @@ module.exports.attach_token = async (event, context, callback) => {
 
   console.log(event.body)
 
-  const valid = Joi.attempt(
-    JSON.parse(event.body),
-    schema
-  )
+  try{
+    const valid = Joi.attempt(
+      JSON.parse(event.body),
+      schema
+    )
 
-  const accountInfo = await LookupAccount(valid.jwt)
+    const accountInfo = await LookupAccount(valid.jwt)
 
-  if(!accountInfo.customerId){  throw new Error('no stripe customer') }
-  if(!accountInfo.emailVerified){  throw new Error('not verified') }
+    if(!accountInfo.customerId){  throw new Error('no stripe customer') }
+    if(!accountInfo.emailVerified){  throw new Error('not verified') }
 
-  let card = null
+    let card = null
 
-  debug('setting default source/token for customer', accountInfo.customerId, accountInfo.email, valid.tokenId)
-  card = await stripe.customers.update(
-    accountInfo.customerId,
-    {source: valid.tokenId}
-  )
+    debug('setting default source/token for customer', accountInfo.customerId, accountInfo.email, valid.tokenId)
+    card = await stripe.customers.update(
+      accountInfo.customerId,
+      {source: valid.tokenId}
+    )
 
 
-  return {
-    statusCode: 200,
-    headers: {
-      'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
-      'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
-    },
-    body: JSON.stringify({
-      tokenId: valid.tokenId
-    })
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
+        'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
+      },
+      body: JSON.stringify({
+        tokenId: valid.tokenId
+      })
+    }
+
+  } catch (e) {
+    debug('ERROR', e)
+    return {
+      statusCode: 400,
+      headers: {
+        'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
+        'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
+      },
+      body: JSON.stringify({
+        error: 'There was an error while accepting payment information.',
+      }),
+    }
+
   }
 }
