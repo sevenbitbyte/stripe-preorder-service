@@ -1,10 +1,8 @@
 const Joi = require('@hapi/joi')
 const debug = require('debug')('mailing-list')
-const Stripe = require('stripe')
 const moment = require('moment')
 const Sendy = require('sendy-api')
 
-let stripe = Stripe(process.env.STRIPE_KEY)
 let sendy = new Sendy(process.env.SENDY_URL, process.env.SENDY_KEY)
 const SendyList = process.env.SENDY_LIST
 

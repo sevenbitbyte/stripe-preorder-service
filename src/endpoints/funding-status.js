@@ -7,7 +7,10 @@ const moment = require('moment')
 const FundAccepting = (process.env.FUND_ACCEPTING !== undefined) ? process.env.FUND_ACCEPTING == 'true' : false;
 const FundGoal = (process.env.FUND_GOAL !== undefined) ? process.env.FUND_GOAL : 50000;
 
+const FundCachedTotal = process.env.FUND_PRE_TOTAL || 0
+
 let stripe = Stripe(process.env.STRIPE_KEY)
+
 
 let cacheTotalAmount = undefined
 let lastUpdate = new moment()
@@ -50,7 +53,25 @@ const crawlOrderStatus = async () => {
   return totalAmount
 }
 
-crawlOrderStatus().then(debug)
+
+try{
+  crawlOrderStatus().then(total=>{
+
+    cacheTotalAmount = total
+    debug('total cached', crawlOrderStatus)
+
+  }).catch(err=>{
+
+    debug('failed to cache order totals', err)
+
+  })
+}catch(err){
+
+  debug('failed to cache order totals', err)
+
+}
+
+
 
 module.exports.funding_status = async (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false; 
@@ -87,16 +108,22 @@ module.exports.funding_status = async (event, context, callback) => {
 
   } catch (e) {
     debug('ERROR', e)
+
     return {
-      statusCode: 400,
+      statusCode: 200,
       headers: {
         'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
         'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
       },
       body: JSON.stringify({
-        error: 'There was an error getting status.',
-      }),
+        error: 'There was an error getting latest status.',
+        funding: FundCachedTotal,
+        goal: FundGoal,
+        accepting: FundAccepting,
+        start: moment().startOf('isoWeek').toDate(),
+        end: moment().endOf('isoWeek').toDate(),
+        ts: moment()
+      })
     }
-
   }
 }

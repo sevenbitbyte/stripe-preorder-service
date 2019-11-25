@@ -6,7 +6,7 @@ const moment = require('moment')
 const verifyJwt = require('../utils/verify-jwt')
 const LookupAccount = require('../utils/lookup-account')
 
-let stripe = Stripe(process.env.STRIPE_KEY)
+let stripe = Stripe(process.env.STRIPE_KEY, {maxNetworkRetries: 2})
 
 
 const schema = Joi.object().keys({

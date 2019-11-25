@@ -1,6 +1,5 @@
 const Joi = require('@hapi/joi')
 const debug = require('debug')('has-account')
-const Stripe = require('stripe')
 const moment = require('moment')
 
 const LookupAccount = require('../utils/lookup-account')
