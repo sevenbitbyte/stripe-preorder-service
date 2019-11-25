@@ -21,6 +21,11 @@ See: [example/client-api.ts](example/client-api.ts)
 
 ## Configuration
 
+### Funding
+
+ * `FUND_GOAL` - The goal amount, defaults to $50,000
+ * `FUND_ACCEPTING` - Is fund raising active? Defaults to `false`
+
 ### Serverless
 
 Modifiy [serverless.yml](serverless.yml) to suite your CORS requirements
