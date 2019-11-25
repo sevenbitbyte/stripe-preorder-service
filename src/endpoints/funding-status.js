@@ -70,9 +70,9 @@ module.exports.funding_status = async (event, context, callback) => {
       'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
     },
     body: JSON.stringify({
-      funding: cacheTotalAmount,
+      funding: 0, //cacheTotalAmount,
       goal: 1,
-      accepting: true,
+      accepting: false,
       start: moment().startOf('isoWeek').toDate(),
       end: moment().endOf('isoWeek').toDate(),
       ts: moment()

@@ -5,6 +5,13 @@ provider:
   stage: dev
   region: us-east-1
   memorySize: 128
+custom:
+  AllowOrigin:
+    dev: '*'
+    prod: 'https://pocket.popcorncomputer.com'
+  CORSOrigin:
+    dev: http://localhost
+    prod: https://pocket.popcorncomputer.com
 plugins:
   - serverless-offline
 functions:
