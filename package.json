@@ -26,7 +26,7 @@
   },
   "scripts": {
     "start": "serverless  offline -P 4000",
-    "deploy": "serverless  deploy --stage dev",
+    "deploy": "CORS_ORIGIN=http://localhost serverless  deploy --stage dev",
     "deploy-prod": "serverless  deploy --stage prod"
   }
 }
