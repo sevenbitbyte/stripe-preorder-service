@@ -19,10 +19,10 @@ const LookupAccount = async (jwt)=>{
   let stripeAddress = null
 
   if(findByEmail.data && findByEmail.data.length > 0){
-
-    customerStripeId = findByEmail.data[0].id
-    stripeSourceId = findByEmail.data[0].default_source
-    stripeAddress = findByEmail.data[0].address
+    const customer = findByEmail.data[0]
+    customerStripeId = customer.id
+    stripeSourceId = customer.default_source
+    stripeAddress = customer.shipping && customer.shipping.address
 
     debug('stripe keys', Object.keys(findByEmail.data[0]))
     debug('shipping address', stripeAddress)
