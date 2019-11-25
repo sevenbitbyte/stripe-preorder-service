@@ -5,6 +5,19 @@ provider:
   stage: dev
   region: us-east-1
   memorySize: 128
+custom:
+  AllowOrigin_dev: '*'
+  AllowOrigin_prod: https://pocket.popcorncomputer.com
+  AllowOrigin_production: https://pocket.popcorncomputer.com
+  CORSOrigin_dev: http://localhost
+  CORSOrigin_prod: https://pocket.popcorncomputer.com
+  CORSOrigin_production: https://pocket.popcorncomputer.com
+  AllowOrigin:
+    dev: '*'
+    prod: 'https://pocket.popcorncomputer.com'
+  CORSOrigin:
+    dev: http://localhost
+    prod: https://pocket.popcorncomputer.com
 plugins:
   - serverless-offline
 functions:
@@ -15,11 +28,8 @@ functions:
           path: api/v1/funding-status
           method: GET
           cors:
-            origins:
-              - http://localhost
-          response:
-            headers:
-              - Access-Control-Allow-Origin: '*'
+            enabled: true
+            origin: ${ ${env:CORS_ORIGIN}, '*'}
   has-account:
     handler: src/endpoints/has-account.has_account
     events: 
@@ -27,11 +37,8 @@ functions:
           path: api/v1/has-account
           method: POST
           cors:
-            origins:
-              - http://localhost
-          response:
-            headers:
-              - Access-Control-Allow-Origin: '*'
+            enabled: true
+            origin: ${ ${env:CORS_ORIGIN}, '*'}
   mailing-list:
     handler: src/endpoints/mailing-list.mailing_list
     events: 
@@ -39,11 +46,8 @@ functions:
           path: api/v1/mailing-list
           method: POST
           cors:
-            origins:
-              - http://localhost
-          response:
-            headers:
-              - Access-Control-Allow-Origin: '*'
+            enabled: true
+            origin: ${ ${env:CORS_ORIGIN}, '*'}
   create-customer:
     handler: src/endpoints/create-customer.create_customer
     events: 
@@ -51,11 +55,8 @@ functions:
           path: api/v1/create-customer
           method: POST
           cors:
-            origins:
-              - http://localhost
-          response:
-            headers:
-              - Access-Control-Allow-Origin: '*'
+            enabled: true
+            origin: ${ ${env:CORS_ORIGIN}, '*'}
   attach-token:
     handler: src/endpoints/attach-token.attach_token
     events: 
@@ -63,11 +64,8 @@ functions:
           path: api/v1/attach-token
           method: POST
           cors:
-            origins:
-              - http://localhost
-          response:
-            headers:
-              - Access-Control-Allow-Origin: '*'
+            enabled: true
+            origin: ${ ${env:CORS_ORIGIN}, '*'}
   create-order:
     handler: src/endpoints/create-order.create_order
     events: 
@@ -75,11 +73,8 @@ functions:
           path: api/v1/create-order
           method: POST
           cors:
-            origins:
-              - http://localhost
-          response:
-            headers:
-              - Access-Control-Allow-Origin: '*'
+            enabled: true
+            origin: ${ ${env:CORS_ORIGIN}, '*'}
   pay-order:
     handler: src/endpoints/pay-order.pay_order
     events: 
@@ -87,11 +82,8 @@ functions:
           path: api/v1/pay-order
           method: POST
           cors:
-            origins:
-              - http://localhost
-          response:
-            headers:
-              - Access-Control-Allow-Origin: '*'
+            enabled: true
+            origin: ${ ${env:CORS_ORIGIN}, '*'}
   list-orders:
     handler: src/endpoints/list-orders.list_orders
     events: 
@@ -99,8 +91,5 @@ functions:
           path: api/v1/list-orders
           method: POST
           cors:
-            origins:
-              - http://localhost
-          response:
-            headers:
-              - Access-Control-Allow-Origin: '*'
+            enabled: true
+            origin: ${ ${env:CORS_ORIGIN}, '*'}
