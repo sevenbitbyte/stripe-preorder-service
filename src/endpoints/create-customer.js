@@ -6,7 +6,7 @@ const moment = require('moment')
 const verifyJwt = require('../utils/verify-jwt')
 const LookupAccount = require('../utils/lookup-account')
 
-let stripe = Stripe(process.env.STRIPE_KEY, {maxNetworkRetries: 2})
+let stripe = Stripe(process.env.STRIPE_KEY)
 
 
 const schema = Joi.object().keys({
@@ -44,15 +44,20 @@ module.exports.create_customer = async (event, context, callback) => {
       schema
     )
 
-    debug(valid)
+    debug('input', valid)
 
     const verification = await verifyJwt(valid.jwt)
 
-    debug(verification)
+    debug('verified jwt', verification)
     
     const account = await LookupAccount(valid.jwt)
 
-    if(!account.emailVerified){  throw new Error('not verified') }
+    debug('lookup account', account)
+
+    if(!account.emailVerified){  
+      debug('email not verified')
+      throw new Error('not verified')
+    }
 
     if(!account.customerId){
       debug('creating user', valid.customer.email)
@@ -90,7 +95,7 @@ module.exports.create_customer = async (event, context, callback) => {
         'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
       },
       body: JSON.stringify({
-        error: 'There was an error while creating the customer. Please check that all the fields are correct and try again.',
+        error: 'There was an error while creating the customer. Please check that all the fields are correct and you have. Check for verification emails.',
       }),
     }
 

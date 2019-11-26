@@ -58,7 +58,7 @@ try{
   crawlOrderStatus().then(total=>{
 
     cacheTotalAmount = total
-    debug('total cached', crawlOrderStatus)
+    debug('total cached', cacheTotalAmount)
 
   }).catch(err=>{
 
