@@ -26,6 +26,7 @@ See: [example/client-api.ts](example/client-api.ts)
  * `FUND_GOAL` - The goal amount, defaults to $50,000
  * `FUND_ACCEPTING` - Is fund raising active? Defaults to `false`
  * `FUND_PRE_TOTAL` - Incase we can't reach stripe, pre-cache a total in env
+ * `FUND_TITLE` - Title of the funding campaign
 
 ### Serverless
 
