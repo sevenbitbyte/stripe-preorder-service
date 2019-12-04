@@ -2,7 +2,7 @@ const Joi = require('@hapi/joi')
 const debug = require('debug')('funding-status')
 const Stripe = require('stripe')
 const moment = require('moment')
-
+const PromiseRetry = require('promise-retry')
 
 const FundAccepting = (process.env.FUND_ACCEPTING !== undefined) ? process.env.FUND_ACCEPTING == 'true' : false;
 const FundGoal = (process.env.FUND_GOAL !== undefined) ? process.env.FUND_GOAL : 50000;
@@ -13,23 +13,38 @@ let stripe = Stripe(process.env.STRIPE_KEY)
 
 
 let cacheTotalAmount = undefined
-let lastUpdate = new moment()
+let lastUpdate = new moment(0)
 
 
 const crawlOrderStatus = async () => {
 
   let totalAmount = 0
   let totalOrders = 0
-  let last_order = null
+  let last_order = undefined
   let has_more = true
 
   while(has_more){
-    const orders = await stripe.orders.list({
-      created: {
-        gt: 1573729756
-      },
-      limit: 100,
-      starting_after: last_order || undefined
+
+    debug('lookup orders')
+
+    const orders = await PromiseRetry({
+      retries: 10,
+      minTimeout: 500,
+      maxTimeout: 3000
+    }, async (retry, number)=>{
+
+      debug('try', number)
+
+      return await stripe.orders.list({
+        created: {
+          gt: 1573729756
+        },
+        limit: 100,
+        starting_after: last_order || undefined
+      }).catch(err=>{
+        debug('stripe error [count=',number,'] ', err)
+        retry(err)
+      })
     })
 
     has_more = orders.has_more
@@ -39,7 +54,7 @@ const crawlOrderStatus = async () => {
     }
 
     orders.data.map((val, idx, arr)=>{
-      if(val.status == 'paid' || val.status == 'fulfilled' || val.status == 'refunded'){
+      if(val.status != 'created'){
         totalAmount += (val.amount) / 100
       }
 
@@ -53,12 +68,14 @@ const crawlOrderStatus = async () => {
   return totalAmount
 }
 
+/*
 
 try{
   crawlOrderStatus().then(total=>{
 
     cacheTotalAmount = total
     debug('total cached', cacheTotalAmount)
+    lastUpdate = new moment()
 
   }).catch(err=>{
 
@@ -71,7 +88,7 @@ try{
 
 }
 
-
+*/
 
 module.exports.funding_status = async (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false; 
@@ -79,7 +96,7 @@ module.exports.funding_status = async (event, context, callback) => {
   try{
     const deltaTime = Math.abs( moment().diff(lastUpdate, 'seconds') )
 
-    if(cacheTotalAmount === undefined || deltaTime > 60){
+    if(cacheTotalAmount === undefined || deltaTime > 30){
       debug('update', deltaTime)
       cacheTotalAmount = await crawlOrderStatus()
       lastUpdate = new moment()

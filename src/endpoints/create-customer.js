@@ -1,4 +1,5 @@
 const Joi = require('@hapi/joi')
+const Hoek = require('@hapi/hoek')
 const debug = require('debug')('create-customer')
 const Stripe = require('stripe')
 const moment = require('moment')
@@ -8,6 +9,7 @@ const LookupAccount = require('../utils/lookup-account')
 
 let stripe = Stripe(process.env.STRIPE_KEY)
 
+const CustomerDescription = process.env.FUND_TITLE || 'Online'
 
 const schema = Joi.object().keys({
   jwt: Joi.string().required(),
@@ -64,7 +66,8 @@ module.exports.create_customer = async (event, context, callback) => {
 
       const customerData = await stripe.customers.create({
         ...valid.customer,
-        description: 'PocketPC Customer'
+        description: CustomerDescription + ' Customer',
+        address: Hoek.reach(valid.customer, 'shipping.address')
       })
 
       account.customerId = customerData.id
