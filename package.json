@@ -21,6 +21,7 @@
     "nodemon": "^1.19.3",
     "promise-retry": "^1.1.1",
     "sendy-api": "^0.1.0",
+    "serverless-dotenv-plugin": "^2.1.1",
     "serverless-http": "^2.3.0",
     "serverless-offline": "^5.12.0",
     "stripe": "^7.10.0"
