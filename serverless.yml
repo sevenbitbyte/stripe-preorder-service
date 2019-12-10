@@ -20,6 +20,7 @@ custom:
     prod: https://pocket.popcorncomputer.com
 plugins:
   - serverless-offline
+  - serverless-dotenv-plugin
 functions:
   funding-status:
     handler: src/endpoints/funding-status.funding_status
