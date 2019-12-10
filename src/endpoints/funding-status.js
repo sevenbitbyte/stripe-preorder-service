@@ -1,4 +1,5 @@
 const Joi = require('@hapi/joi')
+const Hoek = require('@hapi/hoek')
 const debug = require('debug')('funding-status')
 const Stripe = require('stripe')
 const moment = require('moment')
@@ -54,7 +55,9 @@ const crawlOrderStatus = async () => {
     }
 
     orders.data.map((val, idx, arr)=>{
-      if(val.status != 'created'){
+      if(
+         Hoek.reach(val, 'status_transitions.paid') > 0
+      ){
         totalAmount += (val.amount) / 100
       }
 
