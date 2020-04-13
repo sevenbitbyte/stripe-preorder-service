@@ -25,8 +25,6 @@ exports.status = async ()=>{
     apiVersion: '2019-10'
   })
 
-  //shopify.on('callLimits', (limits) => console.log('callLimits = ' + limits))
-
   const orderCount = await shopify.order.count()
 
   let orderList = []
@@ -38,8 +36,6 @@ exports.status = async ()=>{
 
     queryParam.page_info = Hoek.reach(orders, 'nextPageParameters.page_info')
 
-    //console.log('nextPage', queryParam.page_info)
-
     orders.map( order => {
       orderList.push(order)
     })
@@ -47,22 +43,6 @@ exports.status = async ()=>{
     if(!queryParam.page_info){ break }
   }
   
-  let total_tax = 0
-  let total_price = 0
-  let total_line_items_price = 0
-
-  orderList.map( order => {
-    total_tax += parseFloat(order.total_tax)
-    total_price += parseFloat(order.total_price)
-    total_line_items_price += parseFloat(order.total_line_items_price)
-  })
-
-  console.log('limits = ', shopify.callLimits)
-  console.log('total_line_items_price $' + Math.round(total_line_items_price * 100) / 100)
-  console.log('total_price $'+ Math.round(total_price * 100) / 100)
-  console.log('total_tax $'+ Math.round(total_tax * 100) / 100)
-
-
 
   const priceQuery = `$..line_items[?(@.title === "Pocket P.C." || @.title === "Pocket P.C. w/ LoRa")].price`
   const prices = JSONPath(priceQuery, orderList)
@@ -74,8 +54,6 @@ exports.status = async ()=>{
     return parsed
     })
 
-  let avgPrice = sum / prices.length
-  console.log ('avgPrice', avgPrice)
   console.log ('units', prices.length)
   console.log ('raised', sum)
   
