@@ -4,6 +4,7 @@ const debug = require('debug')('funding-status')
 const Stripe = require('stripe')
 const moment = require('moment')
 const PromiseRetry = require('promise-retry')
+const ShopifyStatus = require('../utils/shopify-order-status')
 
 const FundAccepting = (process.env.FUND_ACCEPTING !== undefined) ? process.env.FUND_ACCEPTING == 'true' : false;
 const FundGoal = (process.env.FUND_GOAL !== undefined) ? process.env.FUND_GOAL : 50000;
@@ -101,7 +102,13 @@ module.exports.funding_status = async (event, context, callback) => {
 
     if(cacheTotalAmount === undefined || deltaTime > 30){
       debug('update', deltaTime)
-      cacheTotalAmount = await crawlOrderStatus()
+      
+      const stripeTotal =  await crawlOrderStatus()
+      const shopifyTotal = await ShopifyStatus.status()
+
+      cacheTotalAmount = stripeTotal + (shopifyTotal.raised || 0)
+
+
       lastUpdate = new moment()
     }
     else{

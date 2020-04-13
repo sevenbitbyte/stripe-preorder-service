@@ -36,6 +36,11 @@ Modifiy [serverless.yml](serverless.yml) to suite your CORS requirements
 
  * `STRIPE_KEY` - Stripe secret key
 
+### Shopify
+ * `SHOPIFY_SHOP_NAME` - Shop name
+ * `SHOPIFY_APIKEY` - API Key
+ * `SHOPIFY_PASSWORD` - API Password
+
 ### AWS Cognito
 
  * `COGNITO_POOL_ID` - Your cognito pool id
