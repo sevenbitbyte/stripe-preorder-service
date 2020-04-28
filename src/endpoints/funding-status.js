@@ -64,12 +64,13 @@ const crawlOrderStatus = async () => {
 
       totalOrders++
     })
-
   }
 
   debug('total raised -', totalAmount, 'on', totalOrders, 'orders')
 
-  return totalAmount
+  const status = {raised: totalAmount, orders: totalOrders}
+
+  return status
 }
 
 /*
@@ -104,9 +105,14 @@ module.exports.funding_status = async (event, context, callback) => {
       debug('update', deltaTime)
       
       const stripeTotal =  await crawlOrderStatus()
-      const shopifyTotal = await ShopifyStatus.status()
 
-      cacheTotalAmount = stripeTotal + (shopifyTotal.raised || 0)
+      debug('stripeTotal', stripeTotal)
+
+      const shopifyTotal = await ShopifyStatus()
+
+      debug('shopifyTotal', shopifyTotal)
+
+      cacheTotalAmount = (stripeTotal.raised || 0) + (shopifyTotal.raised || 0)
 
 
       lastUpdate = new moment()
@@ -119,6 +125,7 @@ module.exports.funding_status = async (event, context, callback) => {
     return {
       statusCode: 200,
       headers: {
+        "Content-Type": "application/json",
         'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
         'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
       },
@@ -139,6 +146,7 @@ module.exports.funding_status = async (event, context, callback) => {
     return {
       statusCode: 200,
       headers: {
+        "Content-Type": "application/json",
         'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
         'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
       },

@@ -3,7 +3,7 @@ const Shopify = require('shopify-api-node')
 const {JSONPath} = require('jsonpath-plus')
 
 
-exports.status = async ()=>{
+const getStatus = async()=>{
 
   if(
     ! process.env.SHOPIFY_SHOP_NAME ||
@@ -62,3 +62,5 @@ exports.status = async ()=>{
     units: prices.length
   }
 }
+
+module.exports = getStatus
