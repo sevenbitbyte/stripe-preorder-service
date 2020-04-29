@@ -15,6 +15,7 @@
     "body-parser": "^1.19.0",
     "debug": "^4.1.1",
     "json-query": "^2.2.2",
+    "jsonpath-plus": "^4.0.0",
     "jwk-to-pem": "^2.0.1",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
@@ -24,6 +25,7 @@
     "serverless-dotenv-plugin": "^2.1.1",
     "serverless-http": "^2.3.0",
     "serverless-offline": "^5.12.0",
+    "shopify-api-node": "^3.3.1",
     "stripe": "^7.10.0"
   },
   "scripts": {

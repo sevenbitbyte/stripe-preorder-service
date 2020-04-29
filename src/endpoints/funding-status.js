@@ -4,6 +4,7 @@ const debug = require('debug')('funding-status')
 const Stripe = require('stripe')
 const moment = require('moment')
 const PromiseRetry = require('promise-retry')
+const ShopifyStatus = require('../utils/shopify-order-status')
 
 const FundAccepting = (process.env.FUND_ACCEPTING !== undefined) ? process.env.FUND_ACCEPTING == 'true' : false;
 const FundGoal = (process.env.FUND_GOAL !== undefined) ? process.env.FUND_GOAL : 50000;
@@ -63,12 +64,13 @@ const crawlOrderStatus = async () => {
 
       totalOrders++
     })
-
   }
 
   debug('total raised -', totalAmount, 'on', totalOrders, 'orders')
 
-  return totalAmount
+  const status = {raised: totalAmount, orders: totalOrders}
+
+  return status
 }
 
 /*
@@ -101,7 +103,18 @@ module.exports.funding_status = async (event, context, callback) => {
 
     if(cacheTotalAmount === undefined || deltaTime > 30){
       debug('update', deltaTime)
-      cacheTotalAmount = await crawlOrderStatus()
+      
+      const stripeTotal =  await crawlOrderStatus()
+
+      debug('stripeTotal', stripeTotal)
+
+      const shopifyTotal = await ShopifyStatus()
+
+      debug('shopifyTotal', shopifyTotal)
+
+      cacheTotalAmount = (stripeTotal.raised || 0) + (shopifyTotal.raised || 0)
+
+
       lastUpdate = new moment()
     }
     else{
@@ -112,6 +125,7 @@ module.exports.funding_status = async (event, context, callback) => {
     return {
       statusCode: 200,
       headers: {
+        "Content-Type": "application/json",
         'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
         'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
       },
@@ -132,6 +146,7 @@ module.exports.funding_status = async (event, context, callback) => {
     return {
       statusCode: 200,
       headers: {
+        "Content-Type": "application/json",
         'Access-Control-Allow-Origin': process.env.CORS_ORIGIN, // Required for CORS support to work
         'Access-Control-Allow-Credentials': true, // Required for cookies, authorization headers with HTTPS
       },
